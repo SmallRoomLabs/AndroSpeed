@@ -96,7 +96,7 @@ void main(void) {
                 case 1:DispMsg("HIT",12); break;
                 case 2:DispMsg("SPD",12); break;
                 case 4:DispMsg("REP",12); break;
-                case 8:DispMsg("AST",12); break;
+                case 8:DispMsg("FRU",12); break;
             }
             if ((buttons==0) && (lastButtons>0)) {  // Button just released
                 switch (lastButtons) {
