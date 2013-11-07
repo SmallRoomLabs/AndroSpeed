@@ -8,8 +8,8 @@
 #include "DispTouch.h"
 
 #define TIMEOUT 250
-#define OFFDELAY 33
-#define ONDELAY  33
+#define OFFDELAY 22
+#define ONDELAY  45
 
 const uint8_t wave[]="______-__^-_^^--^^_-^__-______";
 
@@ -36,6 +36,7 @@ uint16_t Game3(void) {
             n=n>>((i&0x03)*2);
             n=n&0x03;
             leds=0;
+            Delay10mS(OFFDELAY);
             setbit(leds,n);
             Delay10mS(ONDELAY);
         }
