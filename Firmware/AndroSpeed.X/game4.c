@@ -7,14 +7,114 @@
 #include "utils.h"
 #include "DispTouch.h"
 
+#define TOP     0x01
+#define MID     0x40
+#define BOTTOM  0x08
+
+#define MAXSPEED    40
+#define MAXDENSITY  120
+#define MAXHITS     3
 
 
-
+extern volatile uint16_t tick;
 
 //
 //
 //
 uint16_t Game4(void) {
+    uint16_t    score=0;
+    uint8_t     ship;                   // Current ship position 0..2
+    uint8_t     astTop,astMid,astBot;   // bitmaps of asteroids
+    uint8_t     speed;                  // Game speed
+    uint8_t     density;                // Density of astroids 0=few 255=jam packed
+    uint8_t     wfr;                    // 1=wait for button release
+    uint8_t     r;
+    uint8_t     cnt;
+    uint8_t     hits;
+
+    cnt=0;
+    ship=1;
+    wfr=0;
+    density=50;
+    speed=60;
+    astTop=0;
+    astMid=0;
+    astBot=0;
+    hits=0;
+
+    for (;;) {
+        disp[0]=disp[1]=disp[2]=0;
+        if (astTop&0x01) disp[0]|=TOP;
+        if (astTop&0x02) disp[1]|=TOP;
+        if (astTop&0x04) disp[2]|=TOP;
+        if (astMid&0x01) disp[0]|=MID;
+        if (astMid&0x02) disp[1]|=MID;
+        if (astMid&0x04) disp[2]|=MID;
+        if (astBot&0x01) disp[0]|=BOTTOM;
+        if (astBot&0x02) disp[1]|=BOTTOM;
+        if (astBot&0x04) disp[2]|=BOTTOM;
+
+        if (tick & 0x10) disp[2-ship]|=BOTTOM;
+        
+        ReadButtons();              // Read buttons and move ship
+         if (!wfr) {
+            if (buttons) wfr=1;
+            if (buttons&0x02) {
+                if (ship>0) ship--;
+            }
+            if (buttons&0x08) {
+                if (ship<2) ship++;
+            }
+            if ( ((ship==0) && (astBot&0x04)) || ((ship==1) && (astBot&0x02)) || ((ship==2) && (astBot&0x01)) ) {
+                for (r=0; r<15; r++) {
+                    DispMsg("HIT",3);
+                    DispMsg("   ",3);
+                }
+                astBot=astMid=astTop=0;
+                hits++;
+                if (hits>=MAXHITS) return score/10;
+                continue;
+            }
+        }
+        if (!buttons) wfr=0;
+
+        cnt++;
+        if (cnt>speed) {
+            score++;
+            if ((score%10)==0) {    // Make game harder
+                if (rand()&1) {
+                    if (speed>MAXSPEED) speed--;
+                } else {
+                    if (density<MAXDENSITY) density++; 
+                }
+                
+            }
+            cnt=0;
+            astBot=astMid;
+            astMid=astTop;
+            astTop=0;
+            r=rand()&0xff;
+            if (r<density) setbit(astTop,1);
+            r=rand()&0xff;
+            if (r<density) setbit(astTop,2);
+            r=rand()&0xff;
+            if (r<density) setbit(astTop,3);
+            if (astTop==0x07) {
+                r=rand()%3;
+                clrbit(astTop,r);
+            }
+            cnt=0;
+        }
+        __delay_ms(5);
+    }
+
+}
+
+
+//
+//
+//
+uint16_t XGame4(void) { // Unfinished NIM game - 3661 bytes
     uint8_t     pile[3];
     uint8_t     oldPile;
     uint8_t     i;
@@ -35,7 +135,7 @@ uint16_t Game4(void) {
     oldPile=pile[sp];
     for (;;) {
         Delay10mS(5);
-        // Display teh values of the piles
+        // Display the values of the piles
         disp[0]=charmap[pile[0]+16];
         disp[1]=charmap[pile[1]+16];
         disp[2]=charmap[pile[2]+16];

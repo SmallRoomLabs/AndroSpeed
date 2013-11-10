@@ -30,6 +30,7 @@ volatile uint8_t    disp[3];    // Bitmaps of the 7-segment displays
 uint16_t            base[4];    // Base value for an untouched button
 uint16_t            limit[4];   // Max value for an untouched button (noise max)
 volatile uint16_t   cps;        // The read value from the CPS
+//uint16_t            pressDelta; //
 
 
 
@@ -39,7 +40,7 @@ volatile uint16_t   cps;        // The read value from the CPS
 //
 void UpdateDisplay(void) {
     static uint8_t cathode=0;
-    uint8_t v;
+    auto uint8_t v;
 
     if (cathode<3) {    // cathode 0..2 is the 7-seg displays
         CCLED=0;        // Turn off all cathodes
@@ -155,7 +156,7 @@ void CPSstart(uint8_t channel) {
 // Store the states in the global variable buttons
 //
 uint8_t ReadButtons(void) {
-    uint8_t v;
+    auto uint8_t v;
     v=0;
 
     cps=0xff;
@@ -188,9 +189,9 @@ uint8_t ReadButtons(void) {
 // It also seeds the random() function
 //
 void CalibrateTouch(void) {
-    uint8_t i,j;
-    uint32_t a;
-    uint32_t rnd;
+    auto uint8_t i,j;
+    auto uint32_t a;
+    auto uint32_t rnd;
 
     rnd=0;
 
@@ -210,7 +211,8 @@ void CalibrateTouch(void) {
             if (cps>limit[j]) limit[j]=cps;
         }
         base[j]=a/64;
-        limit[j]+=((limit[j]-base[j])/2); //Add 50% on to of max read value as the value for touched button
+//        limit[j]+=((limit[j]-base[j])/2); //Add 50% on to of max read value as the value for touched button
+          limit[j]+=(limit[j]-base[j]); //Add 100% on to of max read value as the value for touched button
     }
     DispMsg("   ",50);
     srand(rnd);

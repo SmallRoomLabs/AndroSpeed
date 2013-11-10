@@ -38,7 +38,7 @@
     <conf name="default" type="2">
       <toolsSet>
         <developmentServer>localhost</developmentServer>
-        <targetDevice>PIC16F1829</targetDevice>
+        <targetDevice>PIC16LF1828</targetDevice>
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
         <platformTool>PICkit3PlatformTool</platformTool>
@@ -100,6 +100,7 @@
         <property key="voltagevalue" value="3.125"/>
       </PICkit3PlatformTool>
       <XC8-config-global>
+        <property key="output-file-format" value="-mcof,+elf"/>
       </XC8-config-global>
     </conf>
   </confs>

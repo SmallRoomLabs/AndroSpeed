@@ -39,9 +39,9 @@ uint16_t Game2(void) {
             }
         }
         leds=0x0f;  // Turn on all leds
-        for (count=0; count<333; count++) {
+        for (count=0; count<=333; count++) {
             DispValue(count);
-            if (ReadButtons()>0) {
+            if ((ReadButtons()>0) || (count==333)) {
                 leds=0;
                 Delay10mS(200);
                 score+=(333-count);

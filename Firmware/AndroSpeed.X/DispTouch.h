@@ -12,6 +12,7 @@ extern volatile uint8_t    disp[3];    // Bitmaps of the 7-segment displays
 extern uint16_t            base[4];    // Base value for an untouched button
 extern uint16_t            limit[4];   // Max value for an untouched button (noise max)
 extern volatile uint16_t   cps;         // The read value from the CPS
+//extern uint16_t            pressDelta; //
 
 
 void UpdateDisplay(void);

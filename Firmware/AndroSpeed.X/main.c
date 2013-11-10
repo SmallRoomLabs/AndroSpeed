@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdint.h>         // uint8_t definitions
 #include <stdbool.h>        // true/false definitions
+#include <stdio.h>
 
 #include <xc.h>
 #include "config.h"
@@ -11,6 +12,7 @@
 #include "game3.h"
 #include "game4.h"
 
+volatile uint16_t tick;
 
 //
 // Initialize oscillator and the ports
@@ -34,7 +36,7 @@ void SetupBoard() {
     BUTTON3TRIS=1;
     BUTTON4TRIS=1;
 
-    LATA=0x00;                          // Set all pins low
+    LATA=0x00;                      // Set all pins low
     LATB=0x00;
     LATC=0x00;
 }
@@ -57,10 +59,10 @@ void interrupt TimerOverflow() {
 
     if(TMR2IF==1) {                 // Timer2 is for refreshing the displays & leds
         TMR2IF=0;
+        tick++;
         UpdateDisplay();
     }
 }
-
 
 
 
@@ -75,16 +77,22 @@ void main(void) {
     CPSinit();
 
     // Timer2 is for Display Refresh
+    tick=0;
     T2CON=0b00000111;       // 1:1 postscaler, timer on, 1:64 prescaler
     TMR2IE=1;               // Enable timer 2 interrupts
     TMR2IF=1;               // Clear pending timer 2 interrupt
 
-    GIE=1;                  // Gloablly enable interrupts
+    GIE=1;                  // Globally enable interrupts
     PEIE=1;
     ei();
 
+    DispMsg("   ",50);      // Show current firmware release
+    DispMsg(VERSTRING,30);
+    DispMsg("   ",50);
+
     CalibrateTouch();
 
+    score=0;
     cnt=0;
     for (;;) {
         ReadButtons();
@@ -96,7 +104,7 @@ void main(void) {
                 case 1:DispMsg("HIT",12); break;
                 case 2:DispMsg("SPD",12); break;
                 case 4:DispMsg("REP",12); break;
-                case 8:DispMsg("FRU",12); break;
+                case 8:DispMsg("AST",12); break;
             }
             if ((buttons==0) && (lastButtons>0)) {  // Button just released
                 switch (lastButtons) {
@@ -123,7 +131,6 @@ void main(void) {
         cnt++;
         if (buttons==0) cnt=0;
     }
-
 
 }
 

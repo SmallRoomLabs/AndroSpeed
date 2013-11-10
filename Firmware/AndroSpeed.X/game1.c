@@ -23,7 +23,7 @@ uint16_t Game1(void) {
     uint16_t    nextled;
     uint16_t    score;
     uint8_t     target;
-    uint8_t     hit;
+    int8_t     hit;
     uint8_t     released;
 
 
